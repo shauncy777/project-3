@@ -7,6 +7,7 @@ const colorSection = document.getElementById('color');
 const shirtColors = colorSection.children;
 const activitiesSection = document.getElementById('activities');
 const totalDisplay = document.getElementById('activities-cost');
+const checkBoxes = document.querySelectorAll('#activities input');
 let totalCost = 0;
 const paymentSelect = document.getElementById('payment');
 const paymentMethod = paymentSelect.children;
@@ -17,9 +18,6 @@ const creditCardNum = document.getElementById('cc-num');
 const zipCode = document.getElementById('zip');
 const cvvCode = document.getElementById('cvv');
 const formElement = document.querySelector('form');
-const checkBoxes = document.querySelectorAll('#activities input');
-
-console.log(checkBoxes);
 
 // Prompts user to fill out name on page load
 registrantName.focus();
@@ -74,6 +72,20 @@ activitiesSection.addEventListener('change', (e) => {
         totalCost = totalCost - selectedActivityCost;
     }
     totalDisplay.innerHTML = `$${totalCost}`;
+    for (let i = 0; i < checkBoxes.length; i++)
+        if (
+            e.target.getAttribute('data-day-and-time') ===
+                checkBoxes[i].getAttribute('data-day-and-time') &&
+            e.target !== checkBoxes[i]
+        ) {
+            if (e.target.checked) {
+                checkBoxes[i].disabled = true;
+                checkBoxes[i].parentElement.className = 'disabled';
+            } else {
+                checkBoxes[i].disabled = false;
+                checkBoxes[i].parentElement.className = '';
+            }
+        }
 });
 
 // Listens for user's selection for payment method and displays appropriate fields
@@ -100,7 +112,6 @@ const nameValidation = () => {
             registrantName.value
         )
     ) {
-        alert('Please enter a valid first and last name');
         return false;
     } else {
         return true;
@@ -114,7 +125,14 @@ const eMailValidation = () => {
             eMail.value
         )
     ) {
-        alert('Please enter a valid email address');
+        return false;
+    } else {
+        return true;
+    }
+};
+
+const activitiesValid = () => {
+    if (!totalCost > 0) {
         return false;
     } else {
         return true;
@@ -123,7 +141,6 @@ const eMailValidation = () => {
 
 const ccNumValidation = () => {
     if (!/^(\d{13,16})$/.test(creditCardNum.value)) {
-        alert('Please enter a valid credit card number');
         return false;
     } else {
         return true;
@@ -132,7 +149,6 @@ const ccNumValidation = () => {
 
 const zipCodeValidation = () => {
     if (!/^(\d{5})$/.test(zipCode.value)) {
-        alert('Please enter valid zipcode');
         return false;
     } else {
         return true;
@@ -141,41 +157,43 @@ const zipCodeValidation = () => {
 
 const cvvValidation = () => {
     if (!/^(\d{3})$/.test(cvvCode.value)) {
-        alert('Please enter a valid cvv code');
         return false;
     } else {
         return true;
     }
 };
 
-// Function that evaluates all required form inputs
-const allValidations = () => {
-    if (
-        nameValidation() &&
-        eMailValidation() &&
-        totalCost > 0 &&
-        ccNumValidation() &&
-        zipCodeValidation() &&
-        cvvValidation()
-    ) {
-        return true;
-    } else if (
-        (nameValidation() &&
-            eMailValidation() &&
-            totalCost > 0 &&
-            paymentSelect.value === 'paypal') ||
-        paymentSelect.value === 'bitcoin'
-    ) {
-        return true;
-    } else {
-        return false;
-    }
-};
+// Real-time error message to assist entering accurate cc number
+creditCardNum.addEventListener('keyup', (e) => {
+    validityIndicators(ccNumValidation(), e, creditCardNum, 'cc-hint');
+});
 
 // Listens for form submit and prevents if functions don't return true
 formElement.addEventListener('submit', (e) => {
-    if (!allValidations()) {
-        e.preventDefault();
+    // if (!allValidations()) {
+    //     e.preventDefault();
+    validityIndicators(nameValidation(), e, registrantName, 'name-hint');
+    validityIndicators(eMailValidation(), e, eMail, 'email-hint');
+    validityIndicators(
+        activitiesValid(),
+        e,
+        activitiesSection,
+        'activities-hint'
+    );
+
+    if (paymentSelect.value === 'credit-card') {
+        validityIndicators(ccNumValidation(), e, creditCardNum, 'cc-hint');
+        validityIndicators(zipCodeValidation(), e, zipCode, 'zip-hint');
+        validityIndicators(cvvValidation(), e, cvvCode, 'cvv-hint');
+    }
+    if (creditCardNum.value === '') {
+        creditCardNum.parentElement.className = 'not-valid';
+        creditCardNum.parentElement.lastElementChild.className = 'cc-hint';
+        creditCardNum.parentElement.lastElementChild.innerHTML = `Credit card number field cannot be blank`;
+    } else {
+        creditCardNum.parentElement.className = 'not-valid';
+        creditCardNum.parentElement.lastElementChild.className = 'cc-hint';
+        creditCardNum.parentElement.lastElementChild.innerHTML = `Credit card number must be between 13 - 16 digits`;
     }
 });
 
@@ -187,4 +205,17 @@ for (let i = 0; i < checkBoxes.length; i++) {
     checkBoxes[i].addEventListener('blur', (e) => {
         checkBoxes[i].parentElement.classList.remove('focus');
     });
+}
+
+// Adds valid/not-valid classes and displays in appropriate corresponding fields when input requirements met or not.
+function validityIndicators(functionName, e, requiredField, classAssignment) {
+    if (!functionName) {
+        e.preventDefault();
+        requiredField.parentElement.className = 'not-valid';
+        requiredField.parentElement.lastElementChild.className =
+            classAssignment;
+    } else {
+        requiredField.parentElement.className = 'valid';
+        requiredField.parentElement.lastElementChild.className = `${classAssignment} hint`;
+    }
 }
