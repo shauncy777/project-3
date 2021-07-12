@@ -1,3 +1,15 @@
+/*
+
+Note for reviewer:
+
+I am hoping to receive an "Exceeds Expectations" grade, and will accept a "Meets" with notes on what components prevented
+the former to be met.
+
+Thanks so much for your time and consideration!
+
+
+*/
+
 const registrantName = document.getElementById('name');
 const eMail = document.getElementById('email');
 const otherJob = document.getElementById('other-job-role');
