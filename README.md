@@ -3,4 +3,4 @@
 
 
 This project uses JavaScript to add customized and conditional behavior and interactivity to a registration form for a fictional Full Stack conference.
-Click this link for a live demo:  https://shauncy777.github.io/project-3/
+Click this link for a live demo: 
