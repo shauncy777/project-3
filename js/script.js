@@ -66,7 +66,7 @@ shirtStyle.addEventListener('change', (e) => {
             shirtColors[i].removeAttribute = ('selected', false);
         }
     }
-    // Ensures that top color of 3 available options populates in select box upon choosing theme
+// Ensures that top color of 3 available options populates in select box upon choosing theme
     if (shirtStyle.value == 'js puns') {
         shirtColors[1].selected = true;
     } else if (shirtStyle.value == 'heart js') {
@@ -117,95 +117,79 @@ paymentSelect.addEventListener('change', () => {
     }
 });
 
-// Function helpers for form validation to valid event listener form submission
+// Helper functions for form validation to valid event listener form submission
 const nameValidation = () => {
-    if (
-        !/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/gm.test(
-            registrantName.value
-        )
-    ) {
-        return false;
-    } else {
-        return true;
-    }
+    const nameEntered = registrantName.value;
+    const validName = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/gm.test(nameEntered);
+    return validName;
 };
 
 const eMailValidation = () => {
-    if (
-        // From emailregex.com
-        !/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
-            eMail.value
-        )
-    ) {
-        return false;
-    } else {
-        return true;
-    }
+    const eMailEntered = eMail.value;
+// From emailregex.com
+    const validEMail = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(eMail.value);
+    return validEMail;
 };
 
 const activitiesValid = () => {
-    if (!totalCost > 0) {
-        return false;
-    } else {
-        return true;
-    }
+    const validActivitiesEntered = totalCost > 0;
+        return validActivitiesEntered;
 };
 
 const ccNumValidation = () => {
-    if (!/^(\d{13,16})$/.test(creditCardNum.value)) {
-        return false;
-    } else {
-        return true;
-    }
+    const validCreditCard = /^(\d{13,16})$/.test(creditCardNum.value);
+        return validCreditCard;
 };
 
 const zipCodeValidation = () => {
-    if (!/^(\d{5})$/.test(zipCode.value)) {
-        return false;
-    } else {
-        return true;
-    }
+    const validZip = /^(\d{5})$/.test(zipCode.value);
+        return validZip;
 };
 
 const cvvValidation = () => {
-    if (!/^(\d{3})$/.test(cvvCode.value)) {
-        return false;
-    } else {
-        return true;
-    }
+    const validCVV = /^(\d{3})$/.test(cvvCode.value);
+        return validCVV;
+    
 };
 
 // Real-time error message to assist entering accurate cc number
-creditCardNum.addEventListener('keyup', (e) => {
-    validityIndicators(ccNumValidation(), e, creditCardNum, 'cc-hint');
+cvvCode.addEventListener('keyup', (e) => {
+    validityIndicators(cvvValidation(), e, cvvCode, 'cvv-hint');
 });
 
 // Listens for form submit and prevents if functions don't return true
-formElement.addEventListener('submit', (e) => {
-    // if (!allValidations()) {
-    //     e.preventDefault();
-    validityIndicators(nameValidation(), e, registrantName, 'name-hint');
-    validityIndicators(eMailValidation(), e, eMail, 'email-hint');
-    validityIndicators(
-        activitiesValid(),
-        e,
-        activitiesSection,
-        'activities-hint'
-    );
-
-    if (paymentSelect.value === 'credit-card') {
-        validityIndicators(ccNumValidation(), e, creditCardNum, 'cc-hint');
-        validityIndicators(zipCodeValidation(), e, zipCode, 'zip-hint');
-        validityIndicators(cvvValidation(), e, cvvCode, 'cvv-hint');
-    }
-    if (creditCardNum.value === '') {
-        creditCardNum.parentElement.className = 'not-valid';
-        creditCardNum.parentElement.lastElementChild.className = 'cc-hint';
-        creditCardNum.parentElement.lastElementChild.innerHTML = `Credit card number field cannot be blank`;
+document.querySelector('form').addEventListener('submit', (e) => {
+   validityIndicators(nameValidation(), e, registrantName, 'name-hint');
+    if (!eMailValidation()) {
+        e.preventDefault();
+// Alerts user that blank field is detected        
+        if (eMail.value === ''){
+            eMail.parentElement.className = 'not-valid';
+            eMail.parentElement.lastElementChild.className ='email-hint';
+            eMail.parentElement.lastElementChild.innerHTML ='Email input cannot be blank and must be valid';
+// Alerts user that incorrect format detected       
+        } else {
+            eMail.parentElement.className = 'not-valid';
+            eMail.parentElement.lastElementChild.className ='email-hint';
+            eMail.parentElement.lastElementChild.innerHTML ='Email address must be formatted correctly';
+        }
     } else {
-        creditCardNum.parentElement.className = 'not-valid';
-        creditCardNum.parentElement.lastElementChild.className = 'cc-hint';
-        creditCardNum.parentElement.lastElementChild.innerHTML = `Credit card number must be between 13 - 16 digits`;
+        eMail.parentElement.className = 'valid';
+        eMail.parentElement.lastElementChild.className = 'email hint hint';
+    }
+    if(!activitiesValid()){
+        e.preventDefault();
+        activitiesSection.className = 'activities not-valid';
+        activitiesSection.lastElementChild.className ='activities-hint';
+    } else {
+        activitiesSection.className = 'activities valid';
+        activitiesSection.lastElementChild.className = 'activities hint hint';
+    }
+     
+    if (paymentSelect.value === 'credit-card') {
+        validityIndicators(ccNumValidation(), e, creditCardNum, "cc-hint");
+        validityIndicators(zipCodeValidation(), e, zipCode, "zip-hint");
+        validityIndicators(cvvValidation(), e, cvvCode, "cvv-hint");
     }
 });
 
@@ -220,14 +204,13 @@ for (let i = 0; i < checkBoxes.length; i++) {
 }
 
 // Adds valid/not-valid classes and displays in appropriate corresponding fields when input requirements met or not.
-function validityIndicators(functionName, e, requiredField, classAssignment) {
+function validityIndicators(functionName, e, requiredField, classUpdate) {
     if (!functionName) {
         e.preventDefault();
         requiredField.parentElement.className = 'not-valid';
-        requiredField.parentElement.lastElementChild.className =
-            classAssignment;
+        requiredField.parentElement.lastElementChild.className = classUpdate;
     } else {
         requiredField.parentElement.className = 'valid';
-        requiredField.parentElement.lastElementChild.className = `${classAssignment} hint`;
+        requiredField.parentElement.lastElementChild.className = `${classUpdate} hint`;
     }
 }
