@@ -7,6 +7,6 @@ Beyond the standard usability metrics, this program offers advanced features suc
 a keyup event listener that provides a real-time error message in the required credit-card field as well as a conditional message in the same field that changes 
 depending on the the type of user error. 
 
-Click this link for a live demo: https://shauncy777.github.io/project-3/
+Click this link for a live demo: 
 
 
